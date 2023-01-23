@@ -1,0 +1,1 @@
+ALTER TABLE assistant ADD COLUMN superhero_id serial REFERENCES superhero;
