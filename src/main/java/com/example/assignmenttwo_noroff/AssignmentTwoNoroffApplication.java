@@ -12,6 +12,8 @@ public class AssignmentTwoNoroffApplication {
 
 		API example = new API();
 		example.test();
+		System.out.println(example.getAllCustomers(1));
+
 	}
 
 }

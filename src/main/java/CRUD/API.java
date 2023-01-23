@@ -1,8 +1,10 @@
 package CRUD;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.SQLException;
+import models.Customer;
+
+import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
 
 public class API{
 
@@ -26,5 +28,32 @@ public class API{
         }catch (SQLException e){
             e.printStackTrace();
         }
+    }
+
+    public List<Customer> getAllCustomers(int id){
+        String sql = "SELECT * FROM customer WHERE customer_id = ?";
+        List<Customer> customers = new ArrayList<>();
+
+        try(Connection conn= DriverManager.getConnection(url, username, password)){
+            PreparedStatement statement = conn.prepareStatement(sql);
+            statement.setInt(1, id);
+            ResultSet result = statement.executeQuery();
+            while(result.next()){
+                Customer customer = new Customer(
+                        result.getInt("customer_id"),
+                        result.getString("first_name"),
+                        result.getString("last_name"),
+                        result.getString("country"),
+                        result.getString("postal_code"),
+                        result.getString("phone"),
+                        result.getString("email")
+                );
+                customers.add(customer);
+            }
+
+        }catch (SQLException e){
+            e.printStackTrace();
+        }
+        return customers;
     }
 }
