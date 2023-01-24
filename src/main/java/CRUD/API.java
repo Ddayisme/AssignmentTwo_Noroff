@@ -2,6 +2,8 @@ package CRUD;
 
 import models.Customer;
 import models.CustomerCountry;
+import models.CustomerGenre;
+import models.CustomerSpender;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -160,7 +162,7 @@ public class API {
         return result;
     }
 
-    public String mostCustomersCountry() {
+    public CustomerCountry mostCustomersCountry() {
 
         String sql = "SELECT country , count(*) from customer GROUP BY country ORDER BY 2 DESC Limit 1";
 
@@ -174,11 +176,75 @@ public class API {
 
             result.next();
 
-
-            return result.getString(1);
+            mostPopularCountry = new CustomerCountry(
+                    result.getString(1),
+                    result.getInt(2)
+            );
+            return mostPopularCountry;
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
-
     }
+
+    public CustomerSpender findHigestSpendingCustomer() {
+
+        String sql = "SELECT customer_id, SUM(total) \n" +
+                "FROM invoice\n" +
+                "GROUP BY customer_id\n" +
+                "ORDER BY 2 desc LIMIT 1;";
+
+
+        try (Connection conn = DriverManager.getConnection(url, username, password)) {
+            PreparedStatement statement = conn.prepareStatement(sql);
+            ResultSet result = statement.executeQuery();
+
+            result.next();
+            CustomerSpender customerSpender = new CustomerSpender(
+                    result.getInt("customer_id"),
+                    result.getDouble(2)
+            );
+
+            return customerSpender;
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public List<CustomerGenre> findHighestGenreForACustomer(int id) {
+        String sql = "SELECT genre.name, count(*)\n" +
+                "FROM customer\n" +
+                "INNER JOIN invoice\n" +
+                "ON customer.customer_id = invoice.customer_id\n" +
+                "INNER JOIN invoice_line\n" +
+                "ON invoice.invoice_id = invoice_line.invoice_id\n" +
+                "INNER JOIN track\n" +
+                "ON track.track_id = invoice_line.track_id\n" +
+                "INNER JOIN genre\n" +
+                "ON genre.genre_id = track.genre_id\n" +
+                "WHERE customer.customer_id = ?\n" +
+                "GROUP BY genre.name\n" +
+                "ORDER BY 2 desc";
+
+        try (Connection conn = DriverManager.getConnection(url, username, password)) {
+            PreparedStatement statement = conn.prepareStatement(sql);
+            statement.setInt(1,id);
+            ResultSet result = statement.executeQuery();
+
+            List<CustomerGenre> customer = new ArrayList<>();
+            while (result.next()) {
+                CustomerGenre customerGenre = new CustomerGenre(
+                        result.getString(1),
+                        result.getInt(2)
+                );
+                customer.add(customerGenre);
+            }
+            return customer;
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
 }
