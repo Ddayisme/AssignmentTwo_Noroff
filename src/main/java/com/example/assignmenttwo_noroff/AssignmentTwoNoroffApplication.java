@@ -1,6 +1,7 @@
 package com.example.assignmenttwo_noroff;
 
 import CRUD.API;
+import models.Customer;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
@@ -12,7 +13,8 @@ public class AssignmentTwoNoroffApplication {
 
 		API example = new API();
 		example.test();
-		System.out.println(example.getAllCustomers(1));
+		//System.out.println(example.getAllCustomers());
+		System.out.println(example.getCustomerByName("Leonie"));
 
 	}
 
