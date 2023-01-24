@@ -15,7 +15,10 @@ public class AssignmentTwoNoroffApplication {
 		example.test();
 		//System.out.println(example.getAllCustomers());
 		System.out.println(example.getCustomerByName("Leonie"));
-
+		System.out.println(example.getCustomerById(1));
+		System.out.println(example.getPageOfCustomers(10,15));
+		System.out.println(example.addCustomer("Odd", "Kveseth", "Norway", "0586", "95482043", "oddm@gmail.com"));
+		System.out.println(example.getCustomerByName("Odd"));
 	}
 
 }
