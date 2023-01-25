@@ -5,6 +5,7 @@ import com.example.assignmenttwo_noroff.models.Customer;
 import com.example.assignmenttwo_noroff.models.CustomerCountry;
 import com.example.assignmenttwo_noroff.models.CustomerGenre;
 import com.example.assignmenttwo_noroff.models.CustomerSpender;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Repository;
 
 import java.sql.*;
@@ -14,27 +15,24 @@ import java.util.List;
 @Repository
 public class Crud implements CustomerRepository {
 
-    private String url = "jdbc:postgresql://localhost:5432/Noroff_AssignmentTwo_Db";
-    private String username = "postgres";
+    private final String url;
+    private final String username;
+    private final String password;
 
-    private String password = "1234";
-
-    public Crud() {
-
-    }
-
-    public Crud(String url, String username, String password) {
+    public Crud(@Value("${spring.datasource.url}") String url,
+                @Value("${spring.datasource.username}") String username,
+                @Value("${spring.datasource.password}") String password) {
         this.url = url;
         this.username = username;
         this.password = password;
     }
 
     public void test() {
-        try (Connection conn = DriverManager.getConnection(url, username, password)) {
-            System.out.println("Noe skjer");
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
+        System.out.println(getAllCustomers());
+        System.out.println(getCustomerById(2));
+        System.out.println(getCustomerByName("Leonie"));
+        System.out.println(getPageOfCustomers(10,10));
+        System.out.println(findHigestSpendingCustomer());
     }
 
 
