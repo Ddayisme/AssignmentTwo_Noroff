@@ -7,18 +7,18 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class API {
+public class Crud {
 
     private String url = "jdbc:postgresql://localhost:5432/Noroff_AssignmentTwo_Db";
     private String username = "postgres";
 
     private String password = "1234";
 
-    public API() {
+    public Crud() {
 
     }
 
-    public API(String url, String username, String password) {
+    public Crud(String url, String username, String password) {
         this.url = url;
         this.username = username;
         this.password = password;
