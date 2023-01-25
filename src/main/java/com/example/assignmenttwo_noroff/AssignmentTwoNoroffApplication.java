@@ -21,6 +21,8 @@ public class AssignmentTwoNoroffApplication {
 
 		//example.editCustomerLastName(1, "Rodrigez");
 		System.out.println(example.mostCustomersCountry());
+		System.out.println(example.findHigestSpendingCustomer());
+		System.out.println(example.findHighestGenreForACustomer(12));
 	}
 
 }
