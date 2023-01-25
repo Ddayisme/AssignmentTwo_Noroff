@@ -1,6 +1,5 @@
 package com.example.assignmenttwo_noroff;
 
-import CRUD.Crud;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
@@ -10,8 +9,8 @@ public class AssignmentTwoNoroffApplication {
 	public static void main(String[] args) {
 		SpringApplication.run(AssignmentTwoNoroffApplication.class, args);
 
-		Crud example = new Crud();
-		example.test();
+		//Crud example = new Crud();
+		//example.test();
 		//System.out.println(example.getAllCustomers());
 		//System.out.println(example.getCustomerByName("Leonie"));
 		//System.out.println(example.getCustomerById(1));
@@ -20,9 +19,9 @@ public class AssignmentTwoNoroffApplication {
 		//System.out.println(example.getCustomerByName("Odd"));
 
 		//example.editCustomerLastName(1, "Rodrigez");
-		System.out.println(example.mostCustomersCountry());
-		System.out.println(example.findHigestSpendingCustomer());
-		System.out.println(example.findHighestGenreForACustomer(12));
+		//System.out.println(example.mostCustomersCountry());
+		//System.out.println(example.findHigestSpendingCustomer());
+		//System.out.println(example.findHighestGenreForACustomer(12));
 	}
 
 }

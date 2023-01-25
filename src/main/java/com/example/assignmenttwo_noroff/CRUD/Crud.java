@@ -1,15 +1,18 @@
-package CRUD;
+package com.example.assignmenttwo_noroff.CRUD;
 
-import models.Customer;
-import models.CustomerCountry;
-import models.CustomerGenre;
-import models.CustomerSpender;
+import com.example.assignmenttwo_noroff.Repositories.CustomerRepository;
+import com.example.assignmenttwo_noroff.models.Customer;
+import com.example.assignmenttwo_noroff.models.CustomerCountry;
+import com.example.assignmenttwo_noroff.models.CustomerGenre;
+import com.example.assignmenttwo_noroff.models.CustomerSpender;
+import org.springframework.stereotype.Repository;
 
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Crud {
+@Repository
+public class Crud implements CustomerRepository {
 
     private String url = "jdbc:postgresql://localhost:5432/Noroff_AssignmentTwo_Db";
     private String username = "postgres";
@@ -52,6 +55,7 @@ public class Crud {
         return customer;
     }
 
+    @Override
     public List<Customer> getAllCustomers() {
         List<Customer> customers = new ArrayList<>();
 
@@ -69,7 +73,8 @@ public class Crud {
         return customers;
     }
 
-    public List<Customer> getCustomerById(int id) {
+    @Override
+    public Customer getCustomerById(Integer id) {
         String sql = "SELECT * FROM customer WHERE customer_id = ?";
         List<Customer> customers = new ArrayList<>();
 
@@ -82,7 +87,7 @@ public class Crud {
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        return customers;
+        return customers.get(0);
     }
 
     public List<Customer> getPageOfCustomers(int limit, int offset) {
@@ -102,18 +107,19 @@ public class Crud {
         return customers;
     }
 
-    public int addCustomer(String firstName, String lastName, String country, String postalCode, String phone, String email) {
+    @Override
+    public int insertCustomer(Customer object) {
         String sql = "INSERT INTO customer (first_name, last_name, country, postal_code, phone, email) VALUES (?,?,?,?,?,?)";
         int result = 0;
 
         try (Connection conn = DriverManager.getConnection(url, username, password)) {
             PreparedStatement statement = conn.prepareStatement(sql);
-            statement.setString(1, firstName);
-            statement.setString(2, lastName);
-            statement.setString(3, country);
-            statement.setString(4, postalCode);
-            statement.setString(5, phone);
-            statement.setString(6, email);
+            statement.setString(1, object.first_name());
+            statement.setString(2, object.last_name());
+            statement.setString(3, object.country());
+            statement.setString(4, object.postal_code());
+            statement.setString(5, object.phone());
+            statement.setString(6, object.email());
 
             result = statement.executeUpdate();
 
@@ -141,7 +147,8 @@ public class Crud {
         return customers;
     }
 
-    public int editCustomerLastName(int id, String lastname) {
+    @Override
+    public int updateCustomerLastName(Customer object) {
 
         String sql = "UPDATE customer set last_name=? where customer_id=?";
         int result = 0;
@@ -149,8 +156,8 @@ public class Crud {
 
         try (Connection conn = DriverManager.getConnection(url, username, password)) {
             PreparedStatement statement = conn.prepareStatement(sql);
-            statement.setString(1, lastname);
-            statement.setInt(2, id);
+            statement.setString(1, object.last_name());
+            statement.setInt(2, object.customer_id());
 
             result = statement.executeUpdate();
 
@@ -247,4 +254,13 @@ public class Crud {
         return null;
     }
 
+    @Override
+    public int delete(Customer object){
+        return 0;
+    }
+
+    @Override
+    public int deleteById(Integer id) {
+        return 0;
+    }
 }
