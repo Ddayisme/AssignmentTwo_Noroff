@@ -1,6 +1,6 @@
-Insert into Power (name, description ) values ('Flying', 'Flying into the air');
-Insert into Power (name, description ) values ('Super strengt', 'Being stronk');
-Insert into Power (name, description ) values ('Lazer vision', 'Shooting powerlazors from eyes');
-Insert into Power (name , description) values('Wealth', 'Having alot of dollars')
+INSERT INTO Power (name, description ) VALUES ('Flying', 'Flying into the air');
+INSERT INTO Power (name, description ) VALUES ('Super strengt', 'Being stronk');
+INSERT INTO Power (name, description ) VALUES ('Lazer vision', 'Shooting powerlazors from eyes');
+INSERT INTO Power (name , description) VALUES('Wealth', 'Having alot of dollars')
 
 

@@ -1,6 +1,5 @@
-package com.example.assignmenttwo_noroff.CRUD;
+package com.example.assignmenttwo_noroff.Repositories;
 
-import com.example.assignmenttwo_noroff.Repositories.CustomerRepository;
 import com.example.assignmenttwo_noroff.models.Customer;
 import com.example.assignmenttwo_noroff.models.CustomerCountry;
 import com.example.assignmenttwo_noroff.models.CustomerGenre;
@@ -13,44 +12,18 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Repository
-public class Crud implements CustomerRepository {
+public class CustomerRepositoryImpl implements CustomerRepository{
 
     private final String url;
     private final String username;
     private final String password;
 
-    public Crud(@Value("${spring.datasource.url}") String url,
+    public CustomerRepositoryImpl(@Value("${spring.datasource.url}") String url,
                 @Value("${spring.datasource.username}") String username,
                 @Value("${spring.datasource.password}") String password) {
         this.url = url;
         this.username = username;
         this.password = password;
-    }
-
-    public void test() {
-        System.out.println(getAllCustomers());
-        System.out.println(getCustomerById(2));
-        System.out.println(getCustomerByName("Leonie"));
-        System.out.println(getPageOfCustomers(10,10));
-        System.out.println(findHigestSpendingCustomer());
-    }
-
-
-    public Customer getCustomerByName(String name) {
-        String sql = "Select * from customer where first_name LIKE ?";
-        Customer customer = null;
-
-        try (Connection conn = DriverManager.getConnection(url, username, password)) {
-            PreparedStatement statement = conn.prepareStatement(sql);
-            statement.setString(1, name);
-            ResultSet result = statement.executeQuery();
-
-            customer = fetchCustomers(result).get(0);
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-
-        return customer;
     }
 
     @Override
@@ -88,19 +61,37 @@ public class Crud implements CustomerRepository {
         return customers.get(0);
     }
 
-    public List<Customer> getPageOfCustomers(int limit, int offset) {
-        String sql = "SELECT * FROM customer LIMIT ? OFFSET ?";
-        List<Customer> customers = new ArrayList<>();
+    @Override
+    public Customer getCustomerByName(String name) {
+        String sql = "Select * from customer where first_name LIKE ?";
+        Customer customer = null;
 
         try (Connection conn = DriverManager.getConnection(url, username, password)) {
             PreparedStatement statement = conn.prepareStatement(sql);
-            statement.setInt(1, limit);
-            statement.setInt(2, offset);
+            statement.setString(1, name);
             ResultSet result = statement.executeQuery();
-            customers = fetchCustomers(result);
 
+            customer = fetchCustomers(result).get(0);
         } catch (SQLException e) {
             e.printStackTrace();
+        }
+
+        return customer;
+    }
+
+    private List<Customer> fetchCustomers(ResultSet result) throws SQLException {
+        List<com.example.assignmenttwo_noroff.models.Customer> customers = new ArrayList<>();
+        while (result.next()) {
+            com.example.assignmenttwo_noroff.models.Customer customer = new com.example.assignmenttwo_noroff.models.Customer(
+                    result.getInt("customer_id"),
+                    result.getString("first_name"),
+                    result.getString("last_name"),
+                    result.getString("country"),
+                    result.getString("postal_code"),
+                    result.getString("phone"),
+                    result.getString("email")
+            );
+            customers.add(customer);
         }
         return customers;
     }
@@ -128,23 +119,23 @@ public class Crud implements CustomerRepository {
         return result;
     }
 
-    public List<Customer> fetchCustomers(ResultSet result) throws SQLException {
+    @Override
+    public List<Customer> getPageOfCustomers(int limit, int offset) {
+        String sql = "SELECT * FROM customer LIMIT ? OFFSET ?";
         List<Customer> customers = new ArrayList<>();
-        while (result.next()) {
-            Customer customer = new Customer(
-                    result.getInt("customer_id"),
-                    result.getString("first_name"),
-                    result.getString("last_name"),
-                    result.getString("country"),
-                    result.getString("postal_code"),
-                    result.getString("phone"),
-                    result.getString("email")
-            );
-            customers.add(customer);
+
+        try (Connection conn = DriverManager.getConnection(url, username, password)) {
+            PreparedStatement statement = conn.prepareStatement(sql);
+            statement.setInt(1, limit);
+            statement.setInt(2, offset);
+            ResultSet result = statement.executeQuery();
+            customers = fetchCustomers(result);
+
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
         return customers;
     }
-
     @Override
     public int updateCustomerLastName(Customer object) {
 
@@ -167,6 +158,32 @@ public class Crud implements CustomerRepository {
         return result;
     }
 
+    @Override
+    public CustomerSpender findHighestSpendingCustomer() {
+
+        String sql = "SELECT customer_id, SUM(total) \n" +
+                "FROM invoice\n" +
+                "GROUP BY customer_id\n" +
+                "ORDER BY 2 desc LIMIT 1;";
+
+
+        try (Connection conn = DriverManager.getConnection(url, username, password)) {
+            PreparedStatement statement = conn.prepareStatement(sql);
+            ResultSet result = statement.executeQuery();
+
+            result.next();
+            CustomerSpender customerSpender = new CustomerSpender(
+                    result.getInt("customer_id"),
+                    result.getDouble(2)
+            );
+
+            return customerSpender;
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+    @Override
     public CustomerCountry mostCustomersCountry() {
 
         String sql = "SELECT country , count(*) from customer GROUP BY country ORDER BY 2 DESC Limit 1";
@@ -191,31 +208,7 @@ public class Crud implements CustomerRepository {
         }
     }
 
-    public CustomerSpender findHigestSpendingCustomer() {
-
-        String sql = "SELECT customer_id, SUM(total) \n" +
-                "FROM invoice\n" +
-                "GROUP BY customer_id\n" +
-                "ORDER BY 2 desc LIMIT 1;";
-
-
-        try (Connection conn = DriverManager.getConnection(url, username, password)) {
-            PreparedStatement statement = conn.prepareStatement(sql);
-            ResultSet result = statement.executeQuery();
-
-            result.next();
-            CustomerSpender customerSpender = new CustomerSpender(
-                    result.getInt("customer_id"),
-                    result.getDouble(2)
-            );
-
-            return customerSpender;
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
-
+    @Override
     public List<CustomerGenre> findHighestGenreForACustomer(int id) {
         String sql = "SELECT genre.name, count(*)\n" +
                 "FROM customer\n" +
@@ -229,7 +222,8 @@ public class Crud implements CustomerRepository {
                 "ON genre.genre_id = track.genre_id\n" +
                 "WHERE customer.customer_id = ?\n" +
                 "GROUP BY genre.name\n" +
-                "ORDER BY 2 desc";
+                "ORDER BY 2 desc " +
+                "FETCH FIRST 1 ROW WITH TIES";
 
         try (Connection conn = DriverManager.getConnection(url, username, password)) {
             PreparedStatement statement = conn.prepareStatement(sql);
@@ -253,12 +247,19 @@ public class Crud implements CustomerRepository {
     }
 
     @Override
-    public int delete(Customer object){
+    public int delete(Customer object) {
         return 0;
     }
 
     @Override
     public int deleteById(Integer id) {
         return 0;
+    }
+
+    public void test(){
+        System.out.println(getAllCustomers());
+        System.out.println(findHighestSpendingCustomer());
+        System.out.println(getPageOfCustomers(20,11));
+        System.out.println(findHighestGenreForACustomer(12));
     }
 }

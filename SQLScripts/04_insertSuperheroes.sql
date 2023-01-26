@@ -1,4 +1,4 @@
-Insert into Superhero (name, alias, origin) values('Superman', 'Klark Kent', 'Krypton');
-Insert into Superhero (name, alias, origin) values('Batman', 'Bruce Wayne', 'Gotham City');
-Insert into Superhero (name, alias, origin) values('Wonderwoman', 'Princess Diana', 'Themyscira');
+INSERT INTO Superhero (name, alias, origin) VALUES('Superman', 'Klark Kent', 'Krypton');
+INSERT INTO Superhero (name, alias, origin) VALUES('Batman', 'Bruce Wayne', 'Gotham City');
+INSERT INTO Superhero (name, alias, origin) VALUES('Wonderwoman', 'Princess Diana', 'Themyscira');
 
