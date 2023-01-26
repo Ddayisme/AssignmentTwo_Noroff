@@ -11,6 +11,9 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Our implementation of the CustomerRepository with all the innhereted methods
+ */
 @Repository
 public class CustomerRepositoryImpl implements CustomerRepository{
 
@@ -18,6 +21,13 @@ public class CustomerRepositoryImpl implements CustomerRepository{
     private final String username;
     private final String password;
 
+    /**
+     * Our constructor with the connection data to the DB, fetched from Recources, application.properties
+     *
+     * @param url
+     * @param username
+     * @param password
+     */
     public CustomerRepositoryImpl(@Value("${spring.datasource.url}") String url,
                 @Value("${spring.datasource.username}") String username,
                 @Value("${spring.datasource.password}") String password) {
@@ -26,6 +36,11 @@ public class CustomerRepositoryImpl implements CustomerRepository{
         this.password = password;
     }
 
+    /**
+     * Our implenentation to get a List of all customers
+     *
+     * @return
+     */
     @Override
     public List<Customer> getAllCustomers() {
         List<Customer> customers = new ArrayList<>();
@@ -44,6 +59,12 @@ public class CustomerRepositoryImpl implements CustomerRepository{
         return customers;
     }
 
+    /**
+     * Implementation to get a single customer by Id from the DB
+     *
+     * @param id
+     * @return
+     */
     @Override
     public Customer getCustomerById(Integer id) {
         String sql = "SELECT * FROM customer WHERE customer_id = ?";
@@ -61,6 +82,12 @@ public class CustomerRepositoryImpl implements CustomerRepository{
         return customers.get(0);
     }
 
+    /**
+     * Implementation to get a single customer by firs_name
+     *
+     * @param name
+     * @return
+     */
     @Override
     public Customer getCustomerByName(String name) {
         String sql = "Select * from customer where first_name LIKE ?";
@@ -79,6 +106,15 @@ public class CustomerRepositoryImpl implements CustomerRepository{
         return customer;
     }
 
+    /**
+     * Helping method to get a mapped customer object returned in a list
+     *
+     * @param result
+     * Resultset result, is the result of an SQL-Query
+     *
+     * @return
+     * @throws SQLException
+     */
     private List<Customer> fetchCustomers(ResultSet result) throws SQLException {
         List<com.example.assignmenttwo_noroff.models.Customer> customers = new ArrayList<>();
         while (result.next()) {
@@ -96,6 +132,12 @@ public class CustomerRepositoryImpl implements CustomerRepository{
         return customers;
     }
 
+    /**
+     * Implementation to insert a new Customer object to the DB as a SQL-Query
+     *
+     * @param object
+     * @return
+     */
     @Override
     public int insertCustomer(Customer object) {
         String sql = "INSERT INTO customer (first_name, last_name, country, postal_code, phone, email) VALUES (?,?,?,?,?,?)";
@@ -119,6 +161,17 @@ public class CustomerRepositoryImpl implements CustomerRepository{
         return result;
     }
 
+    /**
+     * Get a page/subset, with a specified amount, from the Customer table in the DB
+     *
+     * @param limit
+     * The limit, number of Customer objects
+     *
+     * @param offset
+     * The index starting point in the DB
+     *
+     * @return
+     */
     @Override
     public List<Customer> getPageOfCustomers(int limit, int offset) {
         String sql = "SELECT * FROM customer LIMIT ? OFFSET ?";
@@ -136,17 +189,31 @@ public class CustomerRepositoryImpl implements CustomerRepository{
         }
         return customers;
     }
-    @Override
-    public int updateCustomerLastName(Customer object) {
 
-        String sql = "UPDATE customer set last_name=? where customer_id=?";
+    /**
+     * Implementation to update the last name of a specified customer in the DB
+     *
+     * @param object
+     * @return
+     */
+    @Override
+    public int updateCustomer(Customer object) {
+
+        String sql = "UPDATE customer set last_name=?, " +
+                "first_name=?, country=?, postal_code=?, phone=?, email=? where customer_id=?";
         int result = 0;
 
 
         try (Connection conn = DriverManager.getConnection(url, username, password)) {
             PreparedStatement statement = conn.prepareStatement(sql);
+
+            statement.setInt(7, object.customer_id());
             statement.setString(1, object.last_name());
-            statement.setInt(2, object.customer_id());
+            statement.setString(2, object.first_name());
+            statement.setString(3, object.country());
+            statement.setString(4, object.postal_code());
+            statement.setString(5, object.phone());
+            statement.setString(6, object.email());
 
             result = statement.executeUpdate();
 
@@ -158,6 +225,11 @@ public class CustomerRepositoryImpl implements CustomerRepository{
         return result;
     }
 
+    /**
+     * Implementation of a SQL-Query to get the highest spending customer form the DB
+     *
+     * @return
+     */
     @Override
     public CustomerSpender findHighestSpendingCustomer() {
 
@@ -183,6 +255,12 @@ public class CustomerRepositoryImpl implements CustomerRepository{
         }
         return null;
     }
+
+    /**
+     * Implementation of a SQL-Query to find which country which has the most customers
+     *
+     * @return
+     */
     @Override
     public CustomerCountry mostCustomersCountry() {
 
@@ -208,6 +286,12 @@ public class CustomerRepositoryImpl implements CustomerRepository{
         }
     }
 
+    /**
+     * Which genre is most popular for a specified customer by Id
+     *
+     * @param id
+     * @return
+     */
     @Override
     public List<CustomerGenre> findHighestGenreForACustomer(int id) {
         String sql = "SELECT genre.name, count(*)\n" +
@@ -256,10 +340,19 @@ public class CustomerRepositoryImpl implements CustomerRepository{
         return 0;
     }
 
+    /**
+     * Test uotput from some methods descibed above
+     */
     public void test(){
         System.out.println(getAllCustomers());
         System.out.println(findHighestSpendingCustomer());
         System.out.println(getPageOfCustomers(20,11));
         System.out.println(findHighestGenreForACustomer(12));
+
+        Customer a_testCustomer= new Customer(
+            4, "Bjørn", "Bjørnsen", "Sweden", "0561", "+46 55778811" , "Bjørn@bjørnsen.sve"
+        );
+
+        updateCustomer(a_testCustomer);
     }
 }

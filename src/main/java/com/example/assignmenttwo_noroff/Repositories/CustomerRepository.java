@@ -7,6 +7,12 @@ import com.example.assignmenttwo_noroff.models.CustomerSpender;
 
 import java.util.List;
 
+/**
+ * Our Customer interface as a repository which inherits from CRUDRepository.
+ *
+ *
+ */
+
 public interface CustomerRepository extends CRUDRepository<Customer, Integer> {
 
     Customer getCustomerByName(String name);
